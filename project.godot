@@ -11,13 +11,17 @@ config_version=5
 [application]
 
 config/name="ColonyGame"
-run/main_scene="uid://be0edg2mfw2ug"
+run/main_scene="uid://d2eey6fjsiia3"
 config/features=PackedStringArray("4.7", "C#", "Mobile")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameServices="*uid://dx248hqht4hfj"
+
 [display]
 
-window/stretch/mode="canvas_items"
+window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 
 [dotnet]

@@ -1,4 +1,12 @@
+res://Scripts/Grid/GridWorld.cs
+res://Scripts/Visual/GameUI.cs
+res://Scripts/Visual/Cursor.cs
 res://Scripts/Camera.cs
 res://Scripts/Main.cs
-res://Scripts/Colonist.cs
+res://Scripts/Colonist/Colonist.cs
 res://Scripts/Grid/GridMovement.cs
+res://Scripts/WorkOrders/Worker.cs
+res://Scripts/Grid/Path/GridPathFinder.cs
+res://Scripts/MainMenu/MainMenu.cs
+res://Scripts/WorkOrders/WorkOrderManager.cs
+res://Scenes/Main.tscn

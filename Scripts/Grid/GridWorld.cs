@@ -1,27 +1,55 @@
 using Godot;
 
-public class GridWorld
+[GlobalClass]
+public partial class GridWorld : Node
 {
-    private readonly TileType[,] _tiles;
-    private readonly float _tileSize;
+    [Export]
+    public float TileSize {get; private set; } = 32;
+    [Export]
+    public int Width { get; private set; } = 40;
+    [Export]
+    public int Height { get; private set; } = 25;
 
-    public int Width { get; }
-    public int Height { get; }
+    private TileType[,] _tiles;
 
-    public GridWorld(TileType[,] tiles, float tileSize)
+    public override void _EnterTree()
     {
-        _tiles = tiles;
-        _tileSize = tileSize;
-
-        Width =
-            tiles.GetLength(0);
-
-        Height =
-            tiles.GetLength(1);
+        AddToGroup("GridWorld");
     }
 
-    public bool IsInside(
-        Vector2I position)
+    public override void _Ready()
+    {
+        _tiles = new TileType[Width, Height];
+
+        GenerateWorld();
+    }
+
+    private void GenerateWorld()
+    {
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
+            {
+                _tiles[x, y] =
+                    y >= 17
+                        ? TileType.Dirt
+                        : TileType.Empty;
+            }
+        }
+
+        // Your world test presets.
+
+        // WorldPresets.AddConcreteRow(_tiles);
+        WorldPresets.AddConcreteWall2(_tiles);
+        // WorldPresets.AddConcreteWall3(_tiles);
+
+        // WorldPresets.AddOneTileHole(_tiles);
+        // WorldPresets.AddTwoTileHole(_tiles);
+        // WorldPresets.AddThreeTileHole(_tiles);
+    }
+
+
+    public bool IsInside(Vector2I position)
     {
         return position.X >= 0 &&
                position.X < Width &&
@@ -29,8 +57,7 @@ public class GridWorld
                position.Y < Height;
     }
 
-    public TileType GetTile(
-        Vector2I position)
+    public TileType GetTile(Vector2I position)
     {
         if (!IsInside(position))
             return TileType.Empty;
@@ -41,9 +68,7 @@ public class GridWorld
         ];
     }
 
-    public void SetTile(
-        Vector2I position,
-        TileType type)
+    public void SetTile(Vector2I position, TileType type)
     {
         if (!IsInside(position))
             return;
@@ -54,18 +79,15 @@ public class GridWorld
         ] = type;
     }
 
-    public bool IsSolid(
-        Vector2I position)
+    public bool IsSolid(Vector2I position)
     {
         if (!IsInside(position))
             return false;
 
-        return GetTile(position) !=
-               TileType.Empty;
+        return GetTile(position) != TileType.Empty;
     }
 
-    public bool CanStand(
-        Vector2I position)
+    public bool CanStand(Vector2I position)
     {
         if (!IsInside(position))
             return false;
@@ -75,8 +97,7 @@ public class GridWorld
             return false;
 
         // Head must be empty.
-        Vector2I head =
-            position + Vector2I.Up;
+        Vector2I head = position + Vector2I.Up;
 
         if (!IsInside(head))
             return false;
@@ -85,8 +106,7 @@ public class GridWorld
             return false;
 
         // Ground must be solid.
-        Vector2I below =
-            position + Vector2I.Down;
+        Vector2I below = position + Vector2I.Down;
 
         if (!IsInside(below))
             return false;
@@ -94,12 +114,9 @@ public class GridWorld
         return IsSolid(below);
     }
 
-    public bool CanWalkTo(
-        Vector2I from,
-        Vector2I to)
+    public bool CanWalkTo(Vector2I from, Vector2I to)
     {
-        if (!IsInside(from) ||
-            !IsInside(to))
+        if (!IsInside(from) || !IsInside(to))
         {
             return false;
         }
@@ -107,8 +124,7 @@ public class GridWorld
         if (from.Y != to.Y)
             return false;
 
-        if (Mathf.Abs(
-                from.X - to.X) != 1)
+        if (Mathf.Abs(from.X - to.X) != 1)
         {
             return false;
         }
@@ -120,15 +136,13 @@ public class GridWorld
         Vector2I from,
         Vector2I to)
     {
-        if (!IsInside(from) ||
-            !IsInside(to))
+        if (!IsInside(from) || !IsInside(to))
         {
             return null;
         }
 
         // Must move exactly one tile horizontally.
-        if (Mathf.Abs(
-                from.X - to.X) != 1)
+        if (Mathf.Abs(from.X - to.X) != 1)
         {
             return null;
         }
@@ -141,8 +155,7 @@ public class GridWorld
             from.Y - to.Y;
 
         // Maximum climb height = 2.
-        if (climbHeight < 1 ||
-            climbHeight > 2)
+        if (climbHeight < 1 || climbHeight > 2)
         {
             return null;
         }
@@ -154,28 +167,18 @@ public class GridWorld
         // climbing upward.
         // ------------------------------------------------
 
-        for (int height = 1;
-             height <= climbHeight;
-             height++)
+        for (int height = 1; height <= climbHeight; height++)
         {
-            Vector2I bodyPosition =
-                new Vector2I(
-                    from.X,
-                    from.Y - height
-                );
+            Vector2I bodyPosition = new Vector2I(from.X, from.Y - height);
 
-            Vector2I headPosition =
-                bodyPosition +
-                Vector2I.Up;
+            Vector2I headPosition = bodyPosition + Vector2I.Up;
 
-            if (!IsInside(bodyPosition) ||
-                !IsInside(headPosition))
+            if (!IsInside(bodyPosition) || !IsInside(headPosition))
             {
                 return null;
             }
 
-            if (IsSolid(bodyPosition) ||
-                IsSolid(headPosition))
+            if (IsSolid(bodyPosition) || IsSolid(headPosition))
             {
                 return null;
             }
@@ -186,17 +189,11 @@ public class GridWorld
         // ------------------------------------------------
 
         Vector2I climbPosition =
-            new Vector2I(
-                from.X,
-                to.Y
-            );
+            new Vector2I(from.X, to.Y);
 
-        Vector2I climbHead =
-            climbPosition +
-            Vector2I.Up;
+        Vector2I climbHead = climbPosition + Vector2I.Up;
 
-        if (IsSolid(climbPosition) ||
-            IsSolid(climbHead))
+        if (IsSolid(climbPosition) || IsSolid(climbHead))
         {
             return null;
         }
@@ -217,13 +214,11 @@ public class GridWorld
         if (IsSolid(position))
             return null;
 
-        Vector2I current =
-            position + Vector2I.Down;
+        Vector2I current = position + Vector2I.Down;
 
         while (IsInside(current))
         {
-            Vector2I below =
-                current + Vector2I.Down;
+            Vector2I below = current + Vector2I.Down;
 
             if (!IsInside(below))
                 return null;
@@ -246,8 +241,7 @@ public class GridWorld
         if (!IsInside(position))
             return null;
 
-        Vector2I current =
-            position;
+        Vector2I current = position;
 
         while (IsInside(current))
         {
@@ -263,12 +257,20 @@ public class GridWorld
     public Vector2I WorldToGrid(Vector2 worldPosition)
     {
         return new Vector2I(
-            Mathf.RoundToInt(
-                worldPosition.X / _tileSize
+            Mathf.FloorToInt(
+                worldPosition.X / TileSize
             ),
-            Mathf.RoundToInt(
-                worldPosition.Y / _tileSize
+            Mathf.FloorToInt(
+                worldPosition.Y / TileSize
             )
+        );
+    }
+
+    public Vector2 GridToWorld(Vector2I gridPosition)
+    {
+        return new Vector2(
+            Mathf.RoundToInt(gridPosition.X * TileSize),
+            Mathf.RoundToInt(gridPosition.Y * TileSize)
         );
     }
 }

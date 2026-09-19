@@ -1,13 +1,24 @@
 using Godot;
 using System.Collections.Generic;
 
-public class GridPathfinder
+[GlobalClass]
+public partial class GridPathFinder : Node
 {
-    private readonly GridWorld _world;
+    private GridWorld _world;
 
-    public GridPathfinder(GridWorld world)
+    /*public GridPathfinder(GridWorld world)
     {
         _world = world;
+    }*/
+
+    public override void _EnterTree()
+    {
+        AddToGroup("GridPathFinder");
+    }
+
+    public override void _Ready()
+    {
+        _world = GameServices.GetGridWorld();
     }
 
     public List<PathStep> FindPath(

@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://d2eey6fjsiia3"]
+
+[ext_resource type="Script" uid="uid://dfnaj5n7kj2lj" path="res://Scripts/MainMenu/MainMenu.cs" id="1_tt5f1"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_u0ya7"]
+font_size = 50
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+
+[node name="MarginContainer" type="Control" unique_id=2051028437]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -3.0
+offset_right = -3.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tt5f1")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1906219808]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.17641911, 0.17641908, 0.17641908, 1)
+
+[node name="Control" type="MarginContainer" parent="." unique_id=1065909863]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="Title" type="Label" parent="Control" unique_id=2108790513]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+text = "Colony Game"
+label_settings = SubResource("LabelSettings_u0ya7")
+horizontal_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control" unique_id=2116035938]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="PlayBtn" type="Button" parent="Control/VBoxContainer" unique_id=1156969600]
+layout_mode = 2
+text = "Play"
+
+[node name="SettingsBtn" type="Button" parent="Control/VBoxContainer" unique_id=1862820892]
+layout_mode = 2
+text = "Settings"
+
+[node name="QuitBtn" type="Button" parent="Control/VBoxContainer" unique_id=1149404463]
+layout_mode = 2
+text = "Quit"
+
+[connection signal="pressed" from="Control/VBoxContainer/PlayBtn" to="." method="_on_play_btn_pressed"]
+[connection signal="pressed" from="Control/VBoxContainer/SettingsBtn" to="." method="_on_settings_btn_pressed"]
+[connection signal="pressed" from="Control/VBoxContainer/QuitBtn" to="." method="_on_quit_btn_pressed"]

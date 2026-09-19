@@ -45,7 +45,6 @@ public partial class Camera : Camera2D
 		if (!mouseEvent.Pressed)
 			return;
 
-
         if (mouseEvent.ButtonIndex == MouseButton.WheelUp)
         {
             _targetZoom += Vector2.One * ZoomStep;

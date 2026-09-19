@@ -10,95 +10,38 @@ public enum TileType
 
 public partial class Main : Node2D
 {
-    private const int Width = 40;
-    private const int Height = 25;
-    private const int TileSize = 32;
-
     private int _nextOrderPriority = 5;
-    private readonly Vector2I PathDebugStart =
+    private readonly Vector2I ColonistStart =
         new Vector2I(32, 16);
-
-    private List<PathStep> _path =
-        new();
 
     // World
     private GridWorld _world;
-    private GridPathfinder _pathfinder;
-
-    private TileType[,] _tiles =
-        new TileType[Width, Height];
-
-    // Colony
-    private Colonist _colonist;
-
+    private GridPathFinder _pathfinder;
     private WorkOrderManager _workOrderManager;
-
+    
     public override void _Ready()
     {
-        GD.Print("MAIN IS RUNNING");
+        _world = GameServices.GetGridWorld();
+        _pathfinder = GameServices.GetGridPathfinder();
+        _workOrderManager = GameServices.GetWorkOrderManager();
 
-        GenerateWorld();
+        for (int i=0; i<10; i++)
+        {
+            Colonist colonist =new Colonist();
+            AddChild(colonist);
 
-        _world =
-            new GridWorld(_tiles, TileSize);
+            colonist.Initialize(ColonistStart);
+            colonist.OnWorkStateChanged += QueueRedraw;
 
-        _pathfinder =
-            new GridPathfinder(_world);
-
-        _workOrderManager =
-            new WorkOrderManager(_world);
-
-        _colonist =
-            new Colonist();
-
-        AddChild(_colonist);
-
-        _colonist.OnWorkStateChanged += QueueRedraw;
-
-        _colonist.Initialize(
-            PathDebugStart,
-            _world,
-            _pathfinder,
-            _workOrderManager
-        );
+            _workOrderManager.RegisterWorker(colonist.Worker);
+        }
 
         QueueRedraw();
     }
 
-    private void GenerateWorld()
+    public override void _Input(InputEvent @event)
     {
-        for (int x = 0;
-             x < Width;
-             x++)
-        {
-            for (int y = 0;
-                 y < Height;
-                 y++)
-            {
-                _tiles[x, y] =
-                    y >= 17
-                        ? TileType.Dirt
-                        : TileType.Empty;
-            }
-        }
-
-        // Your world test presets.
-
-        // WorldPresets.AddConcreteRow(_tiles);
-        // WorldPresets.AddConcreteWall2(_tiles);
-        // WorldPresets.AddConcreteWall3(_tiles);
-
-        // WorldPresets.AddOneTileHole(_tiles);
-        // WorldPresets.AddTwoTileHole(_tiles);
-        // WorldPresets.AddThreeTileHole(_tiles);
-    }
-
-    public override void _Input(
-        InputEvent @event)
-    {
-        if (@event is InputEventKey keyEvent &&
-            keyEvent.Pressed &&
-            !keyEvent.Echo)
+        if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
         {
             switch (keyEvent.Keycode)
             {
@@ -146,8 +89,7 @@ public partial class Main : Node2D
             return;
         }
 
-        if (@event is not
-            InputEventMouseButton mouseEvent)
+        if (@event is not InputEventMouseButton mouseEvent)
         {
             return;
         }
@@ -155,24 +97,22 @@ public partial class Main : Node2D
         if (!mouseEvent.Pressed)
             return;
 
-        Vector2 mousePosition =
-            GetGlobalMousePosition();
+        Vector2 mousePosition = GetGlobalMousePosition();
 
         Vector2I tilePosition =
             new Vector2I(
                 Mathf.FloorToInt(
                     mousePosition.X /
-                    TileSize
+                    _world.TileSize
                 ),
 
                 Mathf.FloorToInt(
                     mousePosition.Y /
-                    TileSize
+                    _world.TileSize
                 )
             );
 
-        if (!_world.IsInside(
-                tilePosition))
+        if (!_world.IsInside(tilePosition))
         {
             return;
         }
@@ -191,19 +131,13 @@ public partial class Main : Node2D
         }
 
         // LMB.
-        if (mouseEvent.ButtonIndex ==
-            MouseButton.Left)
+        if (mouseEvent.ButtonIndex == MouseButton.Left)
         {
             // Dirt = create Dig order.
-            if (_world.GetTile(
-                    tilePosition) ==
-                TileType.Dirt)
+            if (_world.GetTile(tilePosition) == TileType.Dirt)
             {
                 WorkOrder order =
-                    _workOrderManager.CreateDigOrder(
-                        tilePosition,
-                        _nextOrderPriority
-                    );
+                    _workOrderManager.CreateDigOrder(tilePosition, _nextOrderPriority);
 
                 if (order != null)
                 {
@@ -216,89 +150,7 @@ public partial class Main : Node2D
                 QueueRedraw();
                 return;
             }
-
-            // Empty = pathfinding debug.
-            if (_world.GetTile(
-                    tilePosition) ==
-                TileType.Empty)
-            {
-                DebugFindPath(
-                    tilePosition
-                );
-            }
         }
-    }
-
-    private void DebugFindPath(
-        Vector2I target)
-    {
-        if (_world.GetTile(target) !=
-            TileType.Empty)
-        {
-            GD.Print(
-                $"Path target {target} is not empty."
-            );
-
-            return;
-        }
-
-        Vector2I? standableTarget =
-            _world.GetStandableTileBelow(
-                target
-            );
-
-        if (!standableTarget.HasValue)
-        {
-            GD.Print(
-                $"No standable tile below {target}."
-            );
-
-            _path.Clear();
-
-            QueueRedraw();
-
-            return;
-        }
-
-        target =
-            standableTarget.Value;
-
-        _path =
-            _pathfinder.FindPath(
-                PathDebugStart,
-                target
-            );
-
-        GD.Print(
-            $"Path: {PathDebugStart} -> {target}"
-        );
-
-        GD.Print(
-            $"Path length: {_path.Count}"
-        );
-
-        if (_path.Count == 0)
-        {
-            GD.Print("No path found.");
-
-            QueueRedraw();
-
-            return;
-        }
-
-        foreach (PathStep step in _path)
-        {
-            GD.Print(
-                $"{step.Position} - " +
-                $"{step.MovementType}"
-            );
-        }
-
-        _colonist.SetPath(
-            _path
-        );
-
-        QueueRedraw();
     }
 
     public override void _Draw()
@@ -306,18 +158,16 @@ public partial class Main : Node2D
         DrawTiles();
         //DrawGrid();
         DrawWorkOrders();
-        DrawPath();
-        DrawPathDebugStart();
     }
 
     private void DrawTiles()
     {
         for (int x = 0;
-             x < Width;
+             x < _world.Width;
              x++)
         {
             for (int y = 0;
-                 y < Height;
+                 y < _world.Height;
                  y++)
             {
                 Vector2I position =
@@ -349,10 +199,10 @@ public partial class Main : Node2D
 
                 DrawRect(
                     new Rect2(
-                        x * TileSize,
-                        y * TileSize,
-                        TileSize,
-                        TileSize
+                        x * _world.TileSize,
+                        y * _world.TileSize,
+                        _world.TileSize,
+                        _world.TileSize
                     ),
                     tileColor
                 );
@@ -363,11 +213,11 @@ public partial class Main : Node2D
     private void DrawGrid()
     {
         for (int x = 0;
-             x <= Width;
+             x <= _world.Width;
              x++)
         {
             float xPosition =
-                x * TileSize;
+                x * _world.TileSize;
 
             DrawLine(
                 new Vector2(
@@ -377,7 +227,7 @@ public partial class Main : Node2D
 
                 new Vector2(
                     xPosition,
-                    Height * TileSize
+                    _world.Height * _world.TileSize
                 ),
 
                 Colors.Black,
@@ -386,11 +236,11 @@ public partial class Main : Node2D
         }
 
         for (int y = 0;
-             y <= Height;
+             y <= _world.Height;
              y++)
         {
             float yPosition =
-                y * TileSize;
+                y * _world.TileSize;
 
             DrawLine(
                 new Vector2(
@@ -399,7 +249,7 @@ public partial class Main : Node2D
                 ),
 
                 new Vector2(
-                    Width * TileSize,
+                    _world.Width * _world.TileSize,
                     yPosition
                 ),
 
@@ -419,16 +269,16 @@ public partial class Main : Node2D
 
         Rect2 rect =
             new Rect2(
-                tile.X * TileSize,
-                tile.Y * TileSize,
-                TileSize,
-                TileSize
+                tile.X * _world.TileSize,
+                tile.Y * _world.TileSize,
+                _world.TileSize,
+                _world.TileSize
             );
 
     Color priorityColor;
 
     if (!order.IsClaimed &&
-        !_colonist.HasReachableWorkPosition(order))
+        !_workOrderManager.HasReachableWorkPosition(order))
     {
         priorityColor =
             Colors.Magenta;
@@ -451,7 +301,7 @@ public partial class Main : Node2D
         );
 
         // A small circle means that the
-        // order has been claimed by a colonist.
+        // order has been claimed by a worker.
         if (order.IsClaimed)
         {
             Vector2 center =
@@ -511,52 +361,6 @@ public partial class Main : Node2D
         return Colors.Yellow.Lerp(
             Colors.Red,
             highT
-        );
-    }
-
-    private void DrawPath()
-    {
-        foreach (PathStep step
-                 in _path)
-        {
-            Vector2 position =
-                new Vector2(
-                    step.Position.X *
-                        TileSize +
-                        TileSize / 2.0f,
-
-                    step.Position.Y *
-                        TileSize +
-                        TileSize / 2.0f
-                );
-
-            DrawCircle(
-                position,
-                10.0f,
-                Colors.Red
-            );
-        }
-    }
-
-    private void DrawPathDebugStart()
-    {
-        Vector2 position =
-            new Vector2(
-                PathDebugStart.X *
-                    TileSize +
-                    TileSize / 2.0f,
-
-                PathDebugStart.Y *
-                    TileSize +
-                    TileSize / 2.0f
-            );
-
-        DrawCircle(
-            position,
-            14.0f,
-            Colors.Blue,
-            false,
-            3.0f
         );
     }
 }
