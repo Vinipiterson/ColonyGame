@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "kYacuKLeUgE=",
+  "success": true,
+  "projectFilePath": "D:\\colony-game\\ColonyGame.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\PC\\.nuget\\packages\\godot.sourcegenerators\\4.7.2\\godot.sourcegenerators.4.7.2.nupkg.sha512",
+    "C:\\Users\\PC\\.nuget\\packages\\godotsharp\\4.7.2\\godotsharp.4.7.2.nupkg.sha512",
+    "C:\\Users\\PC\\.nuget\\packages\\godotsharpeditor\\4.7.2\\godotsharpeditor.4.7.2.nupkg.sha512"
+  ],
+  "logs": []
+}

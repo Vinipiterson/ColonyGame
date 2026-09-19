@@ -1,0 +1,17 @@
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\bin\Debug\ColonyGame.deps.json
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\bin\Debug\ColonyGame.runtimeconfig.json
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\bin\Debug\ColonyGame.dll
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\bin\Debug\ColonyGame.pdb
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\bin\Debug\GodotSharp.dll
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\bin\Debug\GodotSharpEditor.dll
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\obj\Debug\ColonyGame.csproj.AssemblyReference.cache
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\obj\Debug\ColonyGame.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\obj\Debug\ColonyGame.AssemblyInfoInputs.cache
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\obj\Debug\ColonyGame.AssemblyInfo.cs
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\obj\Debug\ColonyGame.csproj.CoreCompileInputs.cache
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\obj\Debug\ColonyGame.csproj.Up2Date
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\obj\Debug\ColonyGame.dll
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\obj\Debug\refint\ColonyGame.dll
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\obj\Debug\ColonyGame.pdb
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\obj\Debug\ColonyGame.genruntimeconfig.cache
+C:\Users\PC\Documents\colony-game\.godot\mono\temp\obj\Debug\ref\ColonyGame.dll
