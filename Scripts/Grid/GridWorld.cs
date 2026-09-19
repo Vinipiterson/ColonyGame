@@ -3,13 +3,15 @@ using Godot;
 public class GridWorld
 {
     private readonly TileType[,] _tiles;
+    private readonly float _tileSize;
 
     public int Width { get; }
     public int Height { get; }
 
-    public GridWorld(TileType[,] tiles)
+    public GridWorld(TileType[,] tiles, float tileSize)
     {
         _tiles = tiles;
+        _tileSize = tileSize;
 
         Width =
             tiles.GetLength(0);
@@ -257,4 +259,17 @@ public class GridWorld
 
         return null;
     }
+
+    public Vector2I WorldToGrid(Vector2 worldPosition)
+    {
+        return new Vector2I(
+            Mathf.RoundToInt(
+                worldPosition.X / _tileSize
+            ),
+            Mathf.RoundToInt(
+                worldPosition.Y / _tileSize
+            )
+        );
+    }
 }
+

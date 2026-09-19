@@ -5,6 +5,7 @@ public enum ColonistState
 {
     Idle,
     MovingToWork,
+    Climbing,
     Working,
     Falling
 }
@@ -16,8 +17,11 @@ public partial class Colonist : Node2D
     private const float MoveSpeed =
         100.0f;
 
+    private const float ClimbSpeed =
+        100.0f;
+
     private const float FallSpeed =
-        180.0f;
+        400.0f;
 
     private const float WorkSpeed =
         1.0f;
@@ -53,6 +57,11 @@ public partial class Colonist : Node2D
 
     public System.Action OnWorkStateChanged;
 
+
+    // ------------------------------------------------
+    // Initialization
+    // ------------------------------------------------
+
     public void Initialize(
         Vector2I startingPosition,
         GridWorld world,
@@ -77,6 +86,8 @@ public partial class Colonist : Node2D
         State =
             ColonistState.Idle;
 
+        _isMoving = false;
+
         Position =
             GridToWorld(
                 GridPosition
@@ -85,14 +96,23 @@ public partial class Colonist : Node2D
         QueueRedraw();
     }
 
+
+    // ------------------------------------------------
+    // Process
+    // ------------------------------------------------
+
     public override void _Process(
         double delta)
     {
-        // Gravity takes priority over everything
-        // except an already active falling state.
+        // Gravity only applies when the colonist
+        // is not already executing a movement step.
+        //
+        // This is important because climbing can
+        // temporarily have no solid tile directly
+        // underneath the colonist.
         if (State != ColonistState.Falling &&
-            !_isMoving &&
-            !_world.CanStand(GridPosition))
+            State != ColonistState.Climbing &&
+            !_isMoving)
         {
             if (TryStartFalling())
             {
@@ -102,7 +122,10 @@ public partial class Colonist : Node2D
 
         // Priority 10 orders can interrupt
         // whatever the colonist is currently doing.
-        if (State != ColonistState.Falling)
+        //
+        // Do not interrupt an active climb or fall.
+        if (State != ColonistState.Falling &&
+            State != ColonistState.Climbing)
         {
             if (TryHandleEmergencyOrder())
             {
@@ -124,6 +147,12 @@ public partial class Colonist : Node2D
 
                 break;
 
+            case ColonistState.Climbing:
+
+                UpdateClimbing(delta);
+
+                break;
+
             case ColonistState.Working:
 
                 UpdateWorking(delta);
@@ -138,6 +167,11 @@ public partial class Colonist : Node2D
         }
     }
 
+
+    // ------------------------------------------------
+    // Idle
+    // ------------------------------------------------
+
     private void UpdateIdle()
     {
         WorkOrder order =
@@ -148,6 +182,11 @@ public partial class Colonist : Node2D
 
         TryStartWork(order);
     }
+
+
+    // ------------------------------------------------
+    // Work Order Selection
+    // ------------------------------------------------
 
     private WorkOrder FindBestAvailableOrder()
     {
@@ -194,7 +233,7 @@ public partial class Colonist : Node2D
                 bestOrder == null ||
                 priority > bestPriority ||
                 (priority == bestPriority &&
-                pathCost < bestPathCost);
+                 pathCost < bestPathCost);
 
             if (!isBetter)
                 continue;
@@ -211,6 +250,11 @@ public partial class Colonist : Node2D
 
         return bestOrder;
     }
+
+
+    // ------------------------------------------------
+    // Emergency Orders
+    // ------------------------------------------------
 
     private bool TryHandleEmergencyOrder()
     {
@@ -237,7 +281,7 @@ public partial class Colonist : Node2D
         );
     }
 
-        private WorkOrder FindBestEmergencyOrder()
+    private WorkOrder FindBestEmergencyOrder()
     {
         IReadOnlyList<WorkOrder> orders =
             _workOrderManager.GetAvailableOrders();
@@ -284,7 +328,7 @@ public partial class Colonist : Node2D
             if (bestOrder == null ||
                 priority > bestPriority ||
                 (priority == bestPriority &&
-                pathCost < bestPathCost))
+                 pathCost < bestPathCost))
             {
                 bestOrder =
                     order;
@@ -300,6 +344,11 @@ public partial class Colonist : Node2D
         return bestOrder;
     }
 
+
+    // ------------------------------------------------
+    // Priority
+    // ------------------------------------------------
+
     /*
      * This is the colonist's priority function.
      *
@@ -309,6 +358,7 @@ public partial class Colonist : Node2D
      *
      * For now every modifier is 0.
      */
+
     private int GetEffectivePriority(
         WorkOrder order)
     {
@@ -330,13 +380,14 @@ public partial class Colonist : Node2D
     /*
      * Future examples:
      *
-     * Dig    -> -2
-     * Build  -> +1
+     * Dig     -> -2
+     * Build   -> +1
      * Harvest -> +3
      *
      * based on this specific colonist's
      * preferences and abilities.
      */
+
     private int GetWorkTypePriorityModifier(
         WorkOrderType type)
     {
@@ -352,6 +403,11 @@ public partial class Colonist : Node2D
                 return 0;
         }
     }
+
+
+    // ------------------------------------------------
+    // Start Work
+    // ------------------------------------------------
 
     private bool TryStartWork(
         WorkOrder order)
@@ -385,7 +441,8 @@ public partial class Colonist : Node2D
                 _workPosition
             );
 
-        if (GridPosition != _workPosition &&
+        if (GridPosition !=
+                _workPosition &&
             path.Count == 0)
         {
             _currentWorkOrder = null;
@@ -397,22 +454,26 @@ public partial class Colonist : Node2D
             return false;
         }
 
-        State =
-            ColonistState.MovingToWork;
-
         SetPath(path);
 
         return true;
     }
 
-            private Vector2I? FindWorkPosition(
+
+    // ------------------------------------------------
+    // Work Position
+    // ------------------------------------------------
+
+    private Vector2I? FindWorkPosition(
         WorkOrder order)
     {
         Vector2I target =
             order.TilePosition;
 
         Vector2I? bestPosition = null;
-        float bestScore = float.MaxValue;
+
+        float bestScore =
+            float.MaxValue;
 
         const int HorizontalRange = 2;
         const int VerticalRange = 4;
@@ -448,7 +509,8 @@ public partial class Colonist : Node2D
                         workPosition
                     );
 
-                if (GridPosition != workPosition &&
+                if (GridPosition !=
+                        workPosition &&
                     path.Count == 0)
                 {
                     continue;
@@ -467,7 +529,8 @@ public partial class Colonist : Node2D
                     );
 
                 float pathDistance =
-                    GridPosition == workPosition
+                    GridPosition ==
+                        workPosition
                         ? 0.0f
                         : path.Count;
 
@@ -495,49 +558,15 @@ public partial class Colonist : Node2D
         return bestPosition;
     }
 
-    private void CheckWorkPosition(
-        Vector2I workPosition,
-        Vector2I target,
-        ref Vector2I? bestPosition,
-        ref int bestPathCost)
-    {
-        if (!CanSafelyWorkFrom(
-                workPosition,
-                target))
-        {
-            return;
-        }
-
-        List<PathStep> path =
-            _pathfinder.FindPath(
-                GridPosition,
-                workPosition
-            );
-
-        int pathCost =
-            path.Count;
-
-        if (GridPosition == workPosition)
-        {
-            pathCost = 0;
-        }
-
-        if (pathCost < bestPathCost)
-        {
-            bestPathCost =
-                pathCost;
-
-            bestPosition =
-                workPosition;
-        }
-    }
-
     private bool CanSafelyWorkFrom(
         Vector2I workPosition,
         Vector2I target)
     {
-        if (!_world.CanStand(workPosition))
+        if (!_world.CanStand(
+                workPosition))
+        {
             return false;
+        }
 
         // The tile supporting the colonist
         // must not be the tile being destroyed.
@@ -553,11 +582,36 @@ public partial class Colonist : Node2D
                 workPosition
             );
 
-        return GridPosition == workPosition ||
+        return GridPosition ==
+                   workPosition ||
                path.Count > 0;
     }
 
+
+    // ------------------------------------------------
+    // Movement
+    // ------------------------------------------------
+
     private void UpdateMovement(
+        double delta)
+    {
+        UpdateMovementTowardsTarget(
+            MoveSpeed,
+            delta
+        );
+    }
+
+    private void UpdateClimbing(
+        double delta)
+    {
+        UpdateMovementTowardsTarget(
+            ClimbSpeed,
+            delta
+        );
+    }
+
+    private void UpdateMovementTowardsTarget(
+        float speed,
         double delta)
     {
         if (!_isMoving)
@@ -575,18 +629,114 @@ public partial class Colonist : Node2D
         Position =
             Position.MoveToward(
                 targetPosition,
-                MoveSpeed *
+                speed *
                 (float)delta
             );
 
+        UpdateGridPositionFromVisual();
+
         if (Position != targetPosition)
             return;
+
+        Position =
+            targetPosition;
 
         GridPosition =
             _targetGridPosition;
 
         MoveToNextPathPosition();
     }
+
+
+    // ------------------------------------------------
+    // Path
+    // ------------------------------------------------
+
+    public void SetPath(
+        List<PathStep> path)
+    {
+        _path =
+            path ??
+            new List<PathStep>();
+
+        _pathIndex = 0;
+
+        if (_path.Count == 0)
+        {
+            _isMoving = false;
+
+            BeginWorking();
+
+            return;
+        }
+
+        MoveToNextPathPosition();
+    }
+
+    private void MoveToNextPathPosition()
+    {
+        if (_pathIndex >= _path.Count)
+        {
+            _isMoving = false;
+
+            BeginWorking();
+
+            return;
+        }
+
+        PathStep step =
+            _path[_pathIndex];
+
+        _pathIndex++;
+
+        _targetGridPosition =
+            step.Position;
+
+        GD.Print(
+            $"Path Step: " +
+            $"{step.MovementType} -> " +
+            $"{step.Position}"
+        );
+
+        if (_targetGridPosition ==
+            GridPosition)
+        {
+            MoveToNextPathPosition();
+
+            return;
+        }
+
+        _isMoving = true;
+
+        switch (step.MovementType)
+        {
+            case MovementType.Walk:
+
+                State =
+                    ColonistState.MovingToWork;
+
+                break;
+
+            case MovementType.Climb:
+
+                State =
+                    ColonistState.Climbing;
+
+                break;
+
+            case MovementType.Fall:
+
+                State =
+                    ColonistState.Falling;
+
+                break;
+        }
+    }
+
+
+    // ------------------------------------------------
+    // Working
+    // ------------------------------------------------
 
     private void BeginWorking()
     {
@@ -653,6 +803,11 @@ public partial class Colonist : Node2D
         QueueRedraw();
     }
 
+
+    // ------------------------------------------------
+    // Gravity / Falling
+    // ------------------------------------------------
+
     private bool TryStartFalling()
     {
         Vector2I? fallDestination =
@@ -665,6 +820,8 @@ public partial class Colonist : Node2D
 
         _targetGridPosition =
             fallDestination.Value;
+
+        _isMoving = false;
 
         State =
             ColonistState.Falling;
@@ -687,17 +844,37 @@ public partial class Colonist : Node2D
                 (float)delta
             );
 
+        UpdateGridPositionFromVisual();
+
         if (Position != targetPosition)
             return;
+
+        Position =
+            targetPosition;
 
         GridPosition =
             _targetGridPosition;
 
+        // If this fall was part of a path,
+        // continue executing that path.
+        if (_isMoving)
+        {
+            MoveToNextPathPosition();
+
+            return;
+        }
+
+        // Otherwise this was spontaneous gravity.
         State =
             ColonistState.Idle;
 
         QueueRedraw();
     }
+
+
+    // ------------------------------------------------
+    // Work Validation
+    // ------------------------------------------------
 
     private bool IsWorkOrderStillValid()
     {
@@ -715,6 +892,11 @@ public partial class Colonist : Node2D
 
         return true;
     }
+
+
+    // ------------------------------------------------
+    // Cancel Work
+    // ------------------------------------------------
 
     private void CancelCurrentWork()
     {
@@ -737,52 +919,10 @@ public partial class Colonist : Node2D
         OnWorkStateChanged?.Invoke();
     }
 
-    public void SetPath(
-        List<PathStep> path)
-    {
-        _path =
-            path ??
-            new List<PathStep>();
 
-        _pathIndex = 0;
-
-        if (_path.Count == 0)
-        {
-            _isMoving = false;
-
-            return;
-        }
-
-        MoveToNextPathPosition();
-    }
-
-    private void MoveToNextPathPosition()
-    {
-        if (_pathIndex >= _path.Count)
-        {
-            _isMoving = false;
-
-            return;
-        }
-
-        PathStep step =
-            _path[_pathIndex];
-
-        _pathIndex++;
-
-        _targetGridPosition =
-            step.Position;
-
-        if (_targetGridPosition ==
-            GridPosition)
-        {
-            MoveToNextPathPosition();
-
-            return;
-        }
-
-        _isMoving = true;
-    }
+    // ------------------------------------------------
+    // Grid / World Position
+    // ------------------------------------------------
 
     private Vector2 GridToWorld(
         Vector2I gridPosition)
@@ -798,9 +938,51 @@ public partial class Colonist : Node2D
         );
     }
 
+    private Vector2I WorldToGrid(
+        Vector2 worldPosition)
+    {
+        return new Vector2I(
+            Mathf.RoundToInt(
+                worldPosition.X /
+                TileSize -
+                0.5f
+            ),
+
+            Mathf.RoundToInt(
+                worldPosition.Y /
+                TileSize -
+                0.5f
+            )
+        );
+    }
+
+    private void UpdateGridPositionFromVisual()
+    {
+        GridPosition =
+            WorldToGrid(Position);
+    }
+
+
+    // ------------------------------------------------
+    // Reachability
+    // ------------------------------------------------
+
+    public bool HasReachableWorkPosition(
+        WorkOrder order)
+    {
+        return FindWorkPosition(order)
+            .HasValue;
+    }
+
+
+    // ------------------------------------------------
+    // Drawing
+    // ------------------------------------------------
+
     public override void _Draw()
     {
-        const float width = 20.0f;
+        const float width =
+            20.0f;
 
         float height =
             TileSize * 2.0f;
@@ -814,12 +996,5 @@ public partial class Colonist : Node2D
             ),
             Colors.Red
         );
-    }
-
-    public bool HasReachableWorkPosition(
-    WorkOrder order)
-    {
-        return FindWorkPosition(order)
-            .HasValue;
     }
 }

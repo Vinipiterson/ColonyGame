@@ -1,5 +1,4 @@
-res://Scripts/Main.cs
 res://Scripts/Camera.cs
+res://Scripts/Main.cs
 res://Scripts/Colonist.cs
 res://Scripts/Grid/GridMovement.cs
-res://Scenes/Main.tscn

@@ -40,7 +40,7 @@ public partial class Main : Node2D
         GenerateWorld();
 
         _world =
-            new GridWorld(_tiles);
+            new GridWorld(_tiles, TileSize);
 
         _pathfinder =
             new GridPathfinder(_world);
@@ -183,7 +183,7 @@ public partial class Main : Node2D
         {
             _world.SetTile(
                 tilePosition,
-                TileType.Concrete
+                TileType.Dirt
             );
 
             QueueRedraw();
@@ -304,7 +304,7 @@ public partial class Main : Node2D
     public override void _Draw()
     {
         DrawTiles();
-        DrawGrid();
+        //DrawGrid();
         DrawWorkOrders();
         DrawPath();
         DrawPathDebugStart();
