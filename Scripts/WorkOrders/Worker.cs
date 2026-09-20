@@ -40,6 +40,15 @@ public partial class Worker : Node
 
     public WorkOrder CurrentOrder => _currentWorkOrder;
 
+    // Exposed so WorkOrderManager can revalidate the path to
+    // this position when the world changes underneath a worker
+    // that's still MovingToWork. Null when there's no active
+    // assignment to revalidate against.
+    public Vector2I? WorkPosition =>
+        State == WorkerState.MovingToWork || State == WorkerState.Working
+            ? _workPosition
+            : null;
+
     public Action OnWorkStateChanged;
 
     private GridWorld _world;
@@ -198,10 +207,7 @@ public partial class Worker : Node
 
         if (_currentWorkOrder.Type == WorkOrderType.Dig)
         {
-            return _world.GetTile(
-                       _currentWorkOrder.TilePosition
-                   ) ==
-                   TileType.Dirt;
+            return _world.GetTile(_currentWorkOrder.TilePosition) == TileType.Dirt;
         }
 
         return true;

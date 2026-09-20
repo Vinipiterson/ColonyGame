@@ -90,5 +90,33 @@ public partial class Colonist : Node2D, IWorkSkillProvider
             ),
             Colors.Red
         );
+
+        if (GridMovement.DebugDrawPaths)
+        {
+            DrawDebugPath();
+        }
+    }
+
+    private void DrawDebugPath()
+    {
+        IReadOnlyList<PathStep> path = _movement.RemainingPath;
+
+        if (path.Count == 0)
+            return;
+
+        // Everything here is drawn in this node's local space,
+        // so subtract our own Position to convert the movement
+        // component's world-space points into local offsets.
+        Vector2 previous = Vector2.Zero;
+
+        foreach (PathStep step in path)
+        {
+            Vector2 point = _movement.GridToWorld(step.Position) - Position;
+
+            DrawLine(previous, point, Colors.Lime, 2.0f);
+            DrawCircle(point, 4.0f, Colors.Lime);
+
+            previous = point;
+        }
     }
 }

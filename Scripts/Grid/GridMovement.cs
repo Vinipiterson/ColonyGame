@@ -16,7 +16,8 @@ public enum MovementState
  * plus spontaneous gravity when nothing is holding it up.
  *
  * It knows nothing about work orders, colonists, or workers -
- * it only moves a Node2D around a GridWorld.
+ * it only moves a Node2D around a GridWorld, using the shared
+ * GridMovementRules to decide what's physically legal.
  */
 public partial class GridMovement : Node
 {
@@ -26,6 +27,11 @@ public partial class GridMovement : Node
     private const float ClimbSpeed = 100.0f;
     private const float FallSpeed = 400.0f;
 
+    // Flip this in code to draw every mover's current path.
+    // Not [Export] on purpose - it's a global dev switch, not
+    // a per-colonist setting.
+    public static bool DebugDrawPaths = true;
+
     public Vector2I GridPosition { get; private set; }
 
     public MovementState State { get; private set; } = MovementState.Idle;
@@ -33,6 +39,14 @@ public partial class GridMovement : Node
     // True while the mover is physically committed to a step
     // (mid-climb or mid-fall) and should not be redirected.
     public bool IsCommitted => State == MovementState.Climbing || State == MovementState.Falling;
+
+    // Remaining, not-yet-completed steps of the current path -
+    // for debug drawing only. Empty when idle or once the path
+    // finishes.
+    public IReadOnlyList<PathStep> RemainingPath =>
+        _pathIndex < _path.Count
+            ? _path.GetRange(_pathIndex, _path.Count - _pathIndex)
+            : Array.Empty<PathStep>();
 
     // Raised whenever a path finishes (or was empty to begin
     // with) or spontaneous gravity settles.
@@ -93,6 +107,11 @@ public partial class GridMovement : Node
             case MovementState.Falling:
                 UpdateFalling(delta);
                 break;
+        }
+
+        if (DebugDrawPaths)
+        {
+            _visual.QueueRedraw();
         }
     }
 
@@ -208,50 +227,34 @@ public partial class GridMovement : Node
 
     private bool TryStartSpontaneousFalling()
     {
-        Vector2I? fallDestination =
-            _world.GetFallDestination(
-                GridPosition
-            );
+        Vector2I? fallDestination = GridMovementRules.GetFallDestination(_world, GridPosition);
 
         if (!fallDestination.HasValue)
             return false;
 
-        _targetGridPosition =
-            fallDestination.Value;
+        _targetGridPosition = fallDestination.Value;
 
         _followingPath = false;
 
-        State =
-            MovementState.Falling;
+        State = MovementState.Falling;
 
         return true;
     }
 
-    private void UpdateFalling(
-        double delta)
+    private void UpdateFalling(double delta)
     {
-        Vector2 targetPosition =
-            GridToWorld(
-                _targetGridPosition
-            );
+        Vector2 targetPosition = GridToWorld(_targetGridPosition);
 
-        _visual.Position =
-            _visual.Position.MoveToward(
-                targetPosition,
-                FallSpeed *
-                (float)delta
-            );
+        _visual.Position = _visual.Position.MoveToward(targetPosition, FallSpeed * (float)delta);
 
         UpdateGridPositionFromVisual();
 
         if (_visual.Position != targetPosition)
             return;
 
-        _visual.Position =
-            targetPosition;
+        _visual.Position = targetPosition;
 
-        GridPosition =
-            _targetGridPosition;
+        GridPosition = _targetGridPosition;
 
         // If this fall was part of a path, keep going.
         if (_followingPath)
@@ -262,8 +265,7 @@ public partial class GridMovement : Node
         }
 
         // Otherwise this was spontaneous gravity settling.
-        State =
-            MovementState.Idle;
+        State = MovementState.Idle;
 
         OnPathCompleted?.Invoke();
     }
@@ -273,41 +275,28 @@ public partial class GridMovement : Node
     // Grid / World Position
     // ------------------------------------------------
 
-    private Vector2 GridToWorld(
-        Vector2I gridPosition)
+    // Public so callers (debug drawing) can convert path grid
+    // cells to the same world-space points movement itself
+    // uses - GridWorld.GridToWorld returns tile corners, not
+    // the centered points movers actually walk to.
+    public Vector2 GridToWorld(Vector2I gridPosition)
     {
         return new Vector2(
-            gridPosition.X *
-                TileSize +
-                TileSize / 2.0f,
-
-            gridPosition.Y *
-                TileSize +
-                TileSize / 2.0f
+            gridPosition.X * TileSize + TileSize / 2.0f,
+            gridPosition.Y * TileSize + TileSize / 2.0f
         );
     }
 
-    private Vector2I WorldToGrid(
-        Vector2 worldPosition)
+    private Vector2I WorldToGrid(Vector2 worldPosition)
     {
         return new Vector2I(
-            Mathf.RoundToInt(
-                worldPosition.X /
-                TileSize -
-                0.5f
-            ),
-
-            Mathf.RoundToInt(
-                worldPosition.Y /
-                TileSize -
-                0.5f
-            )
+            Mathf.RoundToInt(worldPosition.X / TileSize - 0.5f),
+            Mathf.RoundToInt(worldPosition.Y / TileSize - 0.5f)
         );
     }
 
     private void UpdateGridPositionFromVisual()
     {
-        GridPosition =
-            WorldToGrid(_visual.Position);
+        GridPosition = WorldToGrid(_visual.Position);
     }
 }

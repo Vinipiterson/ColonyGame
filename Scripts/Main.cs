@@ -25,7 +25,7 @@ public partial class Main : Node2D
         _pathfinder = GameServices.GetGridPathfinder();
         _workOrderManager = GameServices.GetWorkOrderManager();
 
-        for (int i=0; i<10; i++)
+        for (int i=0; i<2; i++)
         {
             Colonist colonist =new Colonist();
             AddChild(colonist);
