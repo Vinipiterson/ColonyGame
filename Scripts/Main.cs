@@ -40,7 +40,7 @@ public partial class Main : Node2D
         QueueRedraw();
     }
 
-    public override void _Input(InputEvent @event)
+    /*public override void _UnhandledInput(InputEvent @event)
     {
         if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
         {
@@ -89,67 +89,7 @@ public partial class Main : Node2D
 
             return;
         }
-
-        if (@event is not InputEventMouseButton mouseEvent)
-        {
-            return;
-        }
-
-        if (!mouseEvent.Pressed)
-            return;
-
-        Vector2 mousePosition = GetGlobalMousePosition();
-
-        Vector2I tilePosition =
-            new Vector2I(
-                Mathf.FloorToInt(
-                    mousePosition.X /
-                    _world.TileSize
-                ),
-
-                Mathf.FloorToInt(
-                    mousePosition.Y /
-                    _world.TileSize
-                )
-            );
-
-        if (!_world.IsInside(tilePosition))
-        {
-            return;
-        }
-
-        // RMB = place concrete immediately.
-        if (mouseEvent.ButtonIndex ==
-            MouseButton.Right)
-        {
-            _world.PlaceTestBuilding(mousePosition);
-
-            QueueRedraw();
-            return;
-        }
-
-        // LMB.
-        if (mouseEvent.ButtonIndex == MouseButton.Left)
-        {
-            // Dirt = create Dig order.
-            if (_world.GetTile(tilePosition) == TileType.Dirt)
-            {
-                WorkOrder order =
-                    _workOrderManager.CreateDigOrder(tilePosition, _nextOrderPriority);
-
-                if (order != null)
-                {
-                    GD.Print(
-                        $"Created Dig order at {tilePosition} " +
-                        $"with priority {order.Priority}"
-                    );
-                }
-
-                QueueRedraw();
-                return;
-            }
-        }
-    }
+    }*/
 
     public override void _Draw()
     {

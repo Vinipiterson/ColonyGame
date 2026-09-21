@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://lh54b2cgwwrw"]
 
 [ext_resource type="Script" uid="uid://c53frl07i2uxm" path="res://Scripts/Visual/GameUI.cs" id="1_tyage"]
+[ext_resource type="Script" uid="uid://drokcratyhigh" path="res://Scripts/BuildingTabs.cs" id="2_37hul"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u0ya7"]
 bg_color = Color(0.08627451, 0.08627451, 0.08627451, 0.7882353)
@@ -18,9 +19,9 @@ grow_horizontal = 2
 grow_vertical = 2
 offset_transform_position = Vector2(0.79, 0)
 script = ExtResource("1_tyage")
-_fpsLabel = NodePath("MarginContainer/PanelContainer/VBoxContainer/FPSLabel")
-_frameTimeLabel = NodePath("MarginContainer/PanelContainer/VBoxContainer/FrameTimeLabel")
-_colonistCountLabel = NodePath("MarginContainer/PanelContainer/VBoxContainer/ColonistCountLabel")
+_fpsLabel = NodePath("MarginContainer/DebugInfo/VBoxContainer/FPSLabel")
+_frameTimeLabel = NodePath("MarginContainer/DebugInfo/VBoxContainer/FrameTimeLabel")
+_colonistCountLabel = NodePath("MarginContainer/DebugInfo/VBoxContainer/ColonistCountLabel")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1877728278]
 layout_mode = 1
@@ -29,28 +30,66 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 40
-theme_override_constants/margin_top = 40
-theme_override_constants/margin_right = 40
-theme_override_constants/margin_bottom = 40
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
 
-[node name="PanelContainer" type="PanelContainer" parent="MarginContainer" unique_id=1143713075]
+[node name="DebugInfo" type="PanelContainer" parent="MarginContainer" unique_id=1143713075]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_u0ya7")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/PanelContainer" unique_id=799246114]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/DebugInfo" unique_id=799246114]
 layout_mode = 2
 
-[node name="FPSLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer" unique_id=337773434]
+[node name="FPSLabel" type="Label" parent="MarginContainer/DebugInfo/VBoxContainer" unique_id=337773434]
 layout_mode = 2
 text = "Framerate: X"
 
-[node name="FrameTimeLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer" unique_id=1867569244]
+[node name="FrameTimeLabel" type="Label" parent="MarginContainer/DebugInfo/VBoxContainer" unique_id=1867569244]
 layout_mode = 2
 text = "Frame Time: Xms"
 
-[node name="ColonistCountLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer" unique_id=638632892]
+[node name="ColonistCountLabel" type="Label" parent="MarginContainer/DebugInfo/VBoxContainer" unique_id=638632892]
 layout_mode = 2
 text = "Colonists: X"
+
+[node name="BuildingContainer" type="VBoxContainer" parent="MarginContainer" unique_id=427808732]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+
+[node name="Panel" type="PanelContainer" parent="MarginContainer/BuildingContainer" unique_id=483043770]
+layout_mode = 2
+
+[node name="SelectedTextLabel" type="Label" parent="MarginContainer/BuildingContainer/Panel" unique_id=2047244594]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Selected Tab"
+
+[node name="TabContainer" type="TabContainer" parent="MarginContainer/BuildingContainer" unique_id=1070549426 node_paths=PackedStringArray("SelectedText")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_constants/tab_separation = 10
+tab_alignment = 2
+tabs_position = 1
+clip_tabs = false
+switch_on_drag_hover = false
+deselect_enabled = true
+script = ExtResource("2_37hul")
+SelectedText = NodePath("../Panel/SelectedTextLabel")
+
+[node name="Basic" type="Control" parent="MarginContainer/BuildingContainer/TabContainer" unique_id=292670398]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Confort" type="Control" parent="MarginContainer/BuildingContainer/TabContainer" unique_id=1769447184]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[connection signal="tab_selected" from="MarginContainer/BuildingContainer/TabContainer" to="MarginContainer/BuildingContainer/TabContainer" method="OnTabSelected"]

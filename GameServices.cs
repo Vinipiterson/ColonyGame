@@ -25,4 +25,22 @@ public static class GameServices
         return (StructureGrid) ((SceneTree)Engine.GetMainLoop())
             .GetFirstNodeInGroup("StructureGrid");
     }
+
+    public static PlayerController GetPlayerController()
+    {
+        return (PlayerController) ((SceneTree)Engine.GetMainLoop())
+            .GetFirstNodeInGroup("PlayerController");
+    }
+
+    public static DragController GetDragController()
+    {
+        return (DragController) ((SceneTree)Engine.GetMainLoop())
+            .GetFirstNodeInGroup("DragController");
+    }
+    
+    public static Cursor GetCursor()
+    {
+        return (Cursor) ((SceneTree)Engine.GetMainLoop())
+            .GetFirstNodeInGroup("Cursor");
+    }
 }

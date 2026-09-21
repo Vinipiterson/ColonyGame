@@ -2,11 +2,11 @@
 
 [ext_resource type="Script" uid="uid://3mouac58qb4h" path="res://Scripts/Main.cs" id="1_r150o"]
 [ext_resource type="Script" uid="uid://japlnw1h07tg" path="res://Scripts/Camera.cs" id="2_idj7w"]
-[ext_resource type="Script" uid="uid://b2eonv1mw2gbh" path="res://Scripts/Visual/Cursor.cs" id="3_kln2b"]
 [ext_resource type="PackedScene" uid="uid://lh54b2cgwwrw" path="res://Scenes/GameUI.tscn" id="3_rgh2o"]
 [ext_resource type="Script" uid="uid://bp7j55mampi0w" path="res://Scripts/Grid/GridWorld.cs" id="5_pbw6q"]
 [ext_resource type="Script" uid="uid://dlgo6dlmrokpg" path="res://Scripts/Grid/Path/GridPathFinder.cs" id="6_v1gob"]
 [ext_resource type="Script" uid="uid://c2atcrkpyf815" path="res://Scripts/WorkOrders/WorkOrderManager.cs" id="7_jw32o"]
+[ext_resource type="Script" uid="uid://skkfjd5prbgu" path="res://Scripts/Player/PlayerController.cs" id="8_50glp"]
 
 [node name="MainScene" type="Node2D" unique_id=1448623689]
 script = ExtResource("1_r150o")
@@ -14,9 +14,6 @@ script = ExtResource("1_r150o")
 [node name="Camera2D" type="Camera2D" parent="." unique_id=2114140353]
 offset = Vector2(640, 400)
 script = ExtResource("2_idj7w")
-
-[node name="Cursor" type="Node2D" parent="." unique_id=607353987]
-script = ExtResource("3_kln2b")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1118414744]
 
@@ -33,3 +30,7 @@ metadata/_custom_type_script = "uid://dlgo6dlmrokpg"
 [node name="WorkOrderManager" type="Node" parent="." unique_id=1974016022]
 script = ExtResource("7_jw32o")
 metadata/_custom_type_script = "uid://c2atcrkpyf815"
+
+[node name="PlayerController" type="Node" parent="." unique_id=1291982662]
+script = ExtResource("8_50glp")
+metadata/_custom_type_script = "uid://skkfjd5prbgu"
