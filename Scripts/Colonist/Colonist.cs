@@ -43,6 +43,8 @@ public partial class Colonist : Node2D, IWorkSkillProvider
 
     public void Initialize(Vector2I startingPosition)
     {
+        ZIndex = 10;
+
         _movement = new GridMovement();
         AddChild(_movement);
 

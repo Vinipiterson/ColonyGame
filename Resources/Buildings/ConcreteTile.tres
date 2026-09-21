@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" format=3 uid="uid://b37t7561cxog5"]
+
+[ext_resource type="Script" uid="uid://cmdp8tqdvu608" path="res://Scripts/Build/BuildingDefinition.cs" id="1_5y24m"]
+
+[resource]
+resource_name = "Concrete Tile"
+script = ExtResource("1_5y24m")
+Id = 1
+DisplayName = "Concrete Tile"
+Size = Vector2i(1, 1)
+metadata/_custom_type_script = "uid://cmdp8tqdvu608"

@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://bh1x5i8l8grq"]
+
+[ext_resource type="PackedScene" uid="uid://dw32vt0g3a366" path="res://Scenes/Building.tscn" id="1_ui043"]
+[ext_resource type="Resource" uid="uid://dstwg04c6lnun" path="res://Resources/Buildings/TestBuildingDefinition.tres" id="2_ui043"]
+
+[node name="TestBuilding" unique_id=1884174852 instance=ExtResource("1_ui043")]
+Definition = ExtResource("2_ui043")

@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://dw32vt0g3a366"]
+
+[ext_resource type="Script" uid="uid://bf5867te0bbn2" path="res://Scripts/Build/Building.cs" id="1_33ows"]
+
+[node name="Building" type="Node2D" unique_id=1884174852 node_paths=PackedStringArray("BlueprintVisual", "DefinitiveVisual")]
+script = ExtResource("1_33ows")
+BlueprintVisual = NodePath("Blueprint")
+DefinitiveVisual = NodePath("Visual")
+
+[node name="Blueprint" type="ColorRect" parent="." unique_id=1303217234]
+offset_right = 64.0
+offset_bottom = 65.0
+color = Color(0, 0.5803922, 1, 1)
+
+[node name="Visual" type="ColorRect" parent="." unique_id=2099945568]
+offset_right = 64.0
+offset_bottom = 65.0
+color = Color(0.15487596, 0.154876, 0.15487596, 1)

@@ -10,6 +10,7 @@ public class WorkOrder
 {
     public WorkOrderType Type;
     public Vector2I TilePosition;
+    public Building Building { get; private set; }
 
     public int Priority;
 
@@ -20,21 +21,28 @@ public class WorkOrder
 
     public Worker ClaimedBy { get; private set; }
 
-    public WorkOrder(
-        WorkOrderType type,
-        Vector2I tilePosition,
-        float workRequired,
-        int priority = 5)
+    public WorkOrder(WorkOrderType type, Vector2I tilePosition, float workRequired, int priority = 5)
     {
         Type = type;
         TilePosition = tilePosition;
 
-        Priority =
-            Mathf.Clamp(
-                priority,
-                1,
-                10
-            );
+        Priority = Mathf.Clamp(priority, 1, 10);
+
+        WorkRequired = workRequired;
+        WorkProgress = 0.0f;
+
+        IsClaimed = false;
+        ClaimedBy = null;
+    }
+
+    public WorkOrder(Building building, float workRequired, int priority = 5)
+    {
+        Building = building;
+
+        Type = WorkOrderType.Build;
+        TilePosition = building.GridPosition;
+
+        Priority = Mathf.Clamp(priority, 1, 10);
 
         WorkRequired = workRequired;
         WorkProgress = 0.0f;

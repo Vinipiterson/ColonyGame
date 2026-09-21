@@ -170,6 +170,44 @@ public partial class WorkOrderManager : Node
         return order;
     }
 
+    public WorkOrder CreateBuildOrder(BuildingDefinition definition, PackedScene scene, Vector2I tilePosition, int priority = 5)
+    {
+        if (definition == null)
+            return null;
+
+        Building building = scene.Instantiate<Building>();
+        building.Initialize(definition, tilePosition, _world.GridToWorld(tilePosition), BuildingState.UnderConstruction);
+        AddChild(building);
+
+        if (!GameServices.GetStructureGrid().RegisterBuilding(building))
+        {
+            building.QueueFree();
+
+            GD.Print(
+                $"Failed to register building at {tilePosition}"
+            );
+
+            return null;
+        }
+        else
+        {
+            GD.Print($"Placed building at {tilePosition}");   
+        }
+
+        // Prevent duplicate orders on the same tile.
+        foreach (WorkOrder existingOrder in _workOrders)
+        {
+            if (existingOrder.Type == WorkOrderType.Build && existingOrder.Building == building)
+                return null;
+        }
+
+        var order = new WorkOrder(building, building.Definition.WorkRequired, priority);
+
+        _workOrders.Add(order);
+
+        return order;
+    }
+
     public IReadOnlyList<WorkOrder> GetAvailableOrders()
     {
         return _workOrders;
@@ -187,7 +225,10 @@ public partial class WorkOrderManager : Node
                 break;
 
             case WorkOrderType.Build:
-                // Building implementation later.
+                if (order.Building != null)
+                {
+                    order.Building.CompleteConstruction();
+                }
                 break;
         }
 
@@ -333,30 +374,40 @@ public partial class WorkOrderManager : Node
 
     private Vector2I? FindWorkPosition(Worker worker, WorkOrder order)
     {
+        if (order.Type == WorkOrderType.Build)
+            return FindBuildWorkPosition(worker, order);
+
+        return FindDigWorkPosition(worker, order);
+    }
+
+    private Vector2I? FindDigWorkPosition(Worker worker, WorkOrder order)
+    {
         Vector2I target = order.TilePosition;
 
-        // First choice: any safe position around the block,
-        // ranked purely by how close it actually is to the
-        // worker right now (real path cost, not geometric
-        // distance to the target). CanSafelyWorkFrom lets
-        // standing on top of the block compete normally here
-        // too, as long as digging it out would only be a
-        // one-tile drop; a riskier drop is excluded and only
-        // considered via the fallback below.
         Vector2I? bestPosition = null;
-
         int bestPathCost = int.MaxValue;
 
         for (int xOffset = -HorizontalRange; xOffset <= HorizontalRange; xOffset++)
         {
             for (int yOffset = -VerticalRange; yOffset <= VerticalRange; yOffset++)
             {
-                Vector2I workPosition = new Vector2I(target.X + xOffset, target.Y + yOffset);
+                Vector2I workPosition =
+                    new Vector2I(
+                        target.X + xOffset,
+                        target.Y + yOffset);
 
-                if (!CanSafelyWorkFrom(worker, workPosition, target))
+                if (!CanSafelyWorkFrom(
+                        worker,
+                        workPosition,
+                        target))
+                {
                     continue;
+                }
 
-                int pathCost = GetPathCostTo(worker, workPosition);
+                int pathCost =
+                    GetPathCostTo(
+                        worker,
+                        workPosition);
 
                 if (pathCost < 0)
                     continue;
@@ -372,11 +423,77 @@ public partial class WorkOrderManager : Node
         if (bestPosition.HasValue)
             return bestPosition;
 
-        // Last resort: nothing safe around the block was
-        // reachable, so allow standing directly on top of it.
-        // The colonist will fall once it's dug out, but that's
-        // preferable to never digging it at all.
-        return FindOnTopWorkPosition(worker, target);
+        return FindOnTopWorkPosition(
+            worker,
+            target);
+    }
+
+        private Vector2I? FindBuildWorkPosition(Worker worker, WorkOrder order)
+    {
+        Building building = order.Building;
+
+        if (building == null)
+            return null;
+
+        Vector2I origin = building.GridPosition;
+        Vector2I size = building.Definition.Size;
+
+        Vector2I? bestPosition = null;
+        int bestPathCost = int.MaxValue;
+
+        // Top and bottom edges.
+        for (int x = 0; x < size.X; x++)
+        {
+            CheckBuildWorkPosition(
+                worker,
+                new Vector2I(origin.X + x, origin.Y - 1),
+                ref bestPosition,
+                ref bestPathCost);
+
+            CheckBuildWorkPosition(
+                worker,
+                new Vector2I(origin.X + x, origin.Y + size.Y),
+                ref bestPosition,
+                ref bestPathCost);
+        }
+
+        // Left and right edges.
+        for (int y = 0; y < size.Y; y++)
+        {
+            CheckBuildWorkPosition(
+                worker,
+                new Vector2I(origin.X - 1, origin.Y + y),
+                ref bestPosition,
+                ref bestPathCost);
+
+            CheckBuildWorkPosition(
+                worker,
+                new Vector2I(origin.X + size.X, origin.Y + y),
+                ref bestPosition,
+                ref bestPathCost);
+        }
+
+        return bestPosition;
+    }
+
+    private void CheckBuildWorkPosition(Worker worker, Vector2I position, ref Vector2I? bestPosition, ref int bestPathCost)
+    {
+        if (!_world.IsInside(position))
+            return;
+
+        if (!GridMovementRules.CanStand(_world, position))
+            return;
+
+        int pathCost = GetPathCostTo(worker, position);
+
+        if (pathCost < 0)
+            return;
+
+        if (pathCost >= bestPathCost)
+            return;
+
+        bestPathCost = pathCost;
+        bestPosition = position;
     }
 
     private Vector2I? FindOnTopWorkPosition(Worker worker, Vector2I target)

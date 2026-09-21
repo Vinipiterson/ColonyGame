@@ -1,3 +1,6 @@
+Sprite2D
+ColorRect
+Building
 WorkOrderManager
 GridPathFinder
 GridWorld
@@ -6,10 +9,7 @@ MarginContainer
 CanvasLayer
 Label
 VBoxContainer
-ColorRect
 Control
 Button
 Node2D
 Camera2D
-Node
-CollisionShape2D

@@ -19,4 +19,10 @@ public static class GameServices
         return (WorkOrderManager) ((SceneTree)Engine.GetMainLoop())
             .GetFirstNodeInGroup("WorkOrderManager");
     }
+
+    public static StructureGrid GetStructureGrid()
+    {
+        return (StructureGrid) ((SceneTree)Engine.GetMainLoop())
+            .GetFirstNodeInGroup("StructureGrid");
+    }
 }

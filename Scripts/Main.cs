@@ -25,12 +25,13 @@ public partial class Main : Node2D
         _pathfinder = GameServices.GetGridPathfinder();
         _workOrderManager = GameServices.GetWorkOrderManager();
 
+        Vector2I spawnPosition = new Vector2I(_world.Width / 2, 12);
         for (int i=0; i<2; i++)
         {
-            Colonist colonist =new Colonist();
+            Colonist colonist = new Colonist();
             AddChild(colonist);
 
-            colonist.Initialize(ColonistStart);
+            colonist.Initialize(spawnPosition);
             colonist.OnWorkStateChanged += QueueRedraw;
 
             _workOrderManager.RegisterWorker(colonist.Worker);
@@ -121,10 +122,7 @@ public partial class Main : Node2D
         if (mouseEvent.ButtonIndex ==
             MouseButton.Right)
         {
-            _world.SetTile(
-                tilePosition,
-                TileType.Dirt
-            );
+            _world.PlaceTestBuilding(mousePosition);
 
             QueueRedraw();
             return;
@@ -181,6 +179,9 @@ public partial class Main : Node2D
                         position
                     );
 
+                //Color dirtColor = new Color(105, 51, 0, 1f);
+                //Color dirtColor = new Color(65f / 255f, 19f / 255f, 0f / 255f, 0.95f);
+                Color dirtColor = new Color(56f / 255f, 40f / 255f, 28f / 255f, 1f);
                 Color tileColor =
                     tileType switch
                     {
@@ -188,7 +189,7 @@ public partial class Main : Node2D
                             Colors.LightSkyBlue,
 
                         TileType.Dirt =>
-                            Colors.DarkGoldenrod,
+                            dirtColor,
 
                         TileType.Concrete =>
                             Colors.LightGray,

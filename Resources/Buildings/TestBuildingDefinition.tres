@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="BuildingDefinition" format=3 uid="uid://dstwg04c6lnun"]
+
+[ext_resource type="Script" uid="uid://cmdp8tqdvu608" path="res://Scripts/Build/BuildingDefinition.cs" id="1_8guvo"]
+
+[resource]
+script = ExtResource("1_8guvo")
+Id = 100
+DisplayName = "Test Building"
+Size = Vector2i(2, 2)
+metadata/_custom_type_script = "uid://cmdp8tqdvu608"

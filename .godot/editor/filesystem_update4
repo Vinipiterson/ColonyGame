@@ -1,3 +1,5 @@
+res://Scenes/Main.tscn
+res://Scripts/Build/Building.cs
 res://Scripts/WorkOrders/WorkOrderManager.cs
 res://Scripts/Grid/Path/GridPathFinder.cs
 res://Scripts/Grid/GridWorld.cs
@@ -5,8 +7,12 @@ res://Scripts/Visual/GameUI.cs
 res://Scripts/Visual/Cursor.cs
 res://Scripts/Camera.cs
 res://Scripts/Main.cs
-res://Scripts/Colonist/Colonist.cs
+res://Scripts/Build/BuildingDefinition.cs
 res://Scripts/MainMenu/MainMenu.cs
-res://Scripts/WorkOrders/Worker.cs
+res://Scripts/Colonist/Colonist.cs
 res://Scripts/Grid/GridMovement.cs
-res://Scenes/Main.tscn
+res://Scripts/WorkOrders/Worker.cs
+res://Scenes/Building.tscn
+res://Scenes/Buildings/TestBuilding.tscn
+res://Scripts/Grid/Structure/StructureGrid.cs
+res://Resources/Buildings/TestBuildingDefinition.tres
