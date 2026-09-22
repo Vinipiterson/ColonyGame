@@ -7,6 +7,31 @@
 [ext_resource type="Script" uid="uid://dlgo6dlmrokpg" path="res://Scripts/Grid/Path/GridPathFinder.cs" id="6_v1gob"]
 [ext_resource type="Script" uid="uid://c2atcrkpyf815" path="res://Scripts/WorkOrders/WorkOrderManager.cs" id="7_jw32o"]
 [ext_resource type="Script" uid="uid://skkfjd5prbgu" path="res://Scripts/Player/PlayerController.cs" id="8_50glp"]
+[ext_resource type="Script" uid="uid://cvsw4x34pk3f1" path="res://Scripts/Visual/DragColor.cs" id="8_vy5pj"]
+
+[sub_resource type="Resource" id="Resource_37hul"]
+script = ExtResource("8_vy5pj")
+Mode = 1
+FillColor = Color(0.8327133, 0.4994399, 0, 0.14901961)
+BorderColor = Color(0.83137256, 0.49803922, 0, 1)
+metadata/_custom_type_script = "uid://cvsw4x34pk3f1"
+
+[sub_resource type="Resource" id="Resource_po7eo"]
+script = ExtResource("8_vy5pj")
+Mode = 2
+metadata/_custom_type_script = "uid://cvsw4x34pk3f1"
+
+[sub_resource type="Resource" id="Resource_frnsy"]
+script = ExtResource("8_vy5pj")
+Mode = 3
+FillColor = Color(1, 0, 0, 0.14901961)
+BorderColor = Color(1, 0, 0, 1)
+metadata/_custom_type_script = "uid://cvsw4x34pk3f1"
+
+[sub_resource type="Resource" id="Resource_co6lq"]
+script = ExtResource("8_vy5pj")
+Mode = 4
+metadata/_custom_type_script = "uid://cvsw4x34pk3f1"
 
 [node name="MainScene" type="Node2D" unique_id=1448623689]
 script = ExtResource("1_r150o")
@@ -33,4 +58,5 @@ metadata/_custom_type_script = "uid://c2atcrkpyf815"
 
 [node name="PlayerController" type="Node" parent="." unique_id=1291982662]
 script = ExtResource("8_50glp")
+DragColors = Array[ExtResource("8_vy5pj")]([SubResource("Resource_37hul"), SubResource("Resource_po7eo"), SubResource("Resource_frnsy"), SubResource("Resource_co6lq")])
 metadata/_custom_type_script = "uid://skkfjd5prbgu"

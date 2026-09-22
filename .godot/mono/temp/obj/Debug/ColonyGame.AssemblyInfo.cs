@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ColonyGame")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0a5500a6de927dda7ca27dab6c9a648476075b5f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8542291d7d907fa247f715500978572a86ebd49e")]
 [assembly: System.Reflection.AssemblyProductAttribute("ColonyGame")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ColonyGame")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

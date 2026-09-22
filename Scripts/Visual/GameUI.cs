@@ -5,6 +5,7 @@ public partial class GameUI : Control
     [Export] private Label _fpsLabel;
     [Export] private Label _frameTimeLabel;
     [Export] private Label _colonistCountLabel;
+    [Export] private Label _playerModeLabel;
 
     public override void _Process(double delta)
     {
@@ -16,5 +17,7 @@ public partial class GameUI : Control
 
         int colonistCount = GetTree().GetNodesInGroup("colonists").Count;
         _colonistCountLabel.Text = $"Colonists: {colonistCount}";
+
+        _playerModeLabel.Text = $"Mode: {GameServices.GetPlayerController().CurrentMode}";
     }
 }

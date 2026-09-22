@@ -10,7 +10,7 @@ expand_margin_top = 10.0
 expand_margin_right = 10.0
 expand_margin_bottom = 10.0
 
-[node name="GameUi" type="Control" unique_id=347838900 node_paths=PackedStringArray("_fpsLabel", "_frameTimeLabel", "_colonistCountLabel")]
+[node name="GameUi" type="Control" unique_id=347838900 node_paths=PackedStringArray("_fpsLabel", "_frameTimeLabel", "_colonistCountLabel", "_playerModeLabel")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -22,6 +22,7 @@ script = ExtResource("1_tyage")
 _fpsLabel = NodePath("MarginContainer/DebugInfo/VBoxContainer/FPSLabel")
 _frameTimeLabel = NodePath("MarginContainer/DebugInfo/VBoxContainer/FrameTimeLabel")
 _colonistCountLabel = NodePath("MarginContainer/DebugInfo/VBoxContainer/ColonistCountLabel")
+_playerModeLabel = NodePath("MarginContainer/DebugInfo/VBoxContainer/ModeLabel")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1877728278]
 layout_mode = 1
@@ -55,6 +56,10 @@ text = "Frame Time: Xms"
 [node name="ColonistCountLabel" type="Label" parent="MarginContainer/DebugInfo/VBoxContainer" unique_id=638632892]
 layout_mode = 2
 text = "Colonists: X"
+
+[node name="ModeLabel" type="Label" parent="MarginContainer/DebugInfo/VBoxContainer" unique_id=1137329504]
+layout_mode = 2
+text = "Mode: None"
 
 [node name="BuildingContainer" type="VBoxContainer" parent="MarginContainer" unique_id=427808732]
 layout_mode = 2

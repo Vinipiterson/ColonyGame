@@ -15,6 +15,7 @@ public partial class DragVisualizer : Node2D
     public float TileSize { get; set; }
 
     private DragController _dragController;
+    private Dictionary<PlayerMode, DragColor> _modeColors = new();
 
     public override void _Ready()
     {
@@ -26,6 +27,11 @@ public partial class DragVisualizer : Node2D
         _dragController.DragUpdated += QueueRedraw;
         _dragController.DragCompleted += OnDragFinished;
         _dragController.DragCancelled += OnDragFinished;
+
+        foreach (DragColor dragColor in GameServices.GetPlayerController().DragColors)
+        {
+            _modeColors.Add(dragColor.Mode, dragColor);
+        }
     }
 
     public override void _Draw()
@@ -54,8 +60,12 @@ public partial class DragVisualizer : Node2D
 
         Rect2 rect = new Rect2(position, size);
 
-        DrawRect(rect, FillColor, true);
-        DrawRect(rect, BorderColor, false, BorderWidth);
+        PlayerMode mode = GameServices.GetPlayerController().CurrentMode;
+        if (!_modeColors.TryGetValue(mode, out DragColor colors))
+            return;
+
+        DrawRect(rect, colors.FillColor, true);
+        DrawRect(rect, colors.BorderColor, false, BorderWidth);
     }
 
     private void OnDragFinished(List<Vector2I> cells)

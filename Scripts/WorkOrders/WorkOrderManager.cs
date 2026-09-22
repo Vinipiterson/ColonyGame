@@ -546,4 +546,26 @@ public partial class WorkOrderManager : Node
 
         return worker.GridPosition == workPosition || path.Count > 0;
     }
+
+    public void CancelOrders(List<Vector2I> tiles)
+    {
+        HashSet<Vector2I> tileSet = new(tiles);
+
+        for (int i = _workOrders.Count - 1; i >= 0; i--)
+        {
+            WorkOrder order = _workOrders[i];
+
+            if (!tileSet.Contains(order.TilePosition))
+                continue;
+
+            if (order.IsClaimed)
+            {
+                order.Release();
+            }
+
+            _workOrders.RemoveAt(i);
+        }
+
+        // Notify UI / visualizers if you have an event for this.
+    }
 }

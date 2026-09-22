@@ -40,57 +40,6 @@ public partial class Main : Node2D
         QueueRedraw();
     }
 
-    /*public override void _UnhandledInput(InputEvent @event)
-    {
-        if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
-        {
-            switch (keyEvent.Keycode)
-            {
-                case Key.Key1:
-                    _nextOrderPriority = 1;
-                    break;
-
-                case Key.Key2:
-                    _nextOrderPriority = 2;
-                    break;
-
-                case Key.Key3:
-                    _nextOrderPriority = 3;
-                    break;
-
-                case Key.Key4:
-                    _nextOrderPriority = 4;
-                    break;
-
-                case Key.Key5:
-                    _nextOrderPriority = 5;
-                    break;
-
-                case Key.Key6:
-                    _nextOrderPriority = 6;
-                    break;
-
-                case Key.Key7:
-                    _nextOrderPriority = 7;
-                    break;
-
-                case Key.Key8:
-                    _nextOrderPriority = 8;
-                    break;
-
-                case Key.Key9:
-                    _nextOrderPriority = 9;
-                    break;
-
-                case Key.Key0:
-                    _nextOrderPriority = 10;
-                    break;
-            }
-
-            return;
-        }
-    }*/
-
     public override void _Draw()
     {
         DrawTiles();
