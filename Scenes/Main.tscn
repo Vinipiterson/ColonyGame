@@ -8,6 +8,9 @@
 [ext_resource type="Script" uid="uid://c2atcrkpyf815" path="res://Scripts/WorkOrders/WorkOrderManager.cs" id="7_jw32o"]
 [ext_resource type="Script" uid="uid://skkfjd5prbgu" path="res://Scripts/Player/PlayerController.cs" id="8_50glp"]
 [ext_resource type="Script" uid="uid://cvsw4x34pk3f1" path="res://Scripts/Visual/DragColor.cs" id="8_vy5pj"]
+[ext_resource type="Script" uid="uid://duxkrs2evcj1i" path="res://Scripts/Build/BuildingCatalog.cs" id="9_bmxlf"]
+[ext_resource type="PackedScene" uid="uid://bh1x5i8l8grq" path="res://Scenes/Buildings/TestBuilding.tscn" id="10_4kpch"]
+[ext_resource type="PackedScene" uid="uid://b3no41t1pdm8j" path="res://Scenes/Buildings/TestBuilding2.tscn" id="11_4kpch"]
 
 [sub_resource type="Resource" id="Resource_37hul"]
 script = ExtResource("8_vy5pj")
@@ -60,3 +63,11 @@ metadata/_custom_type_script = "uid://c2atcrkpyf815"
 script = ExtResource("8_50glp")
 DragColors = Array[ExtResource("8_vy5pj")]([SubResource("Resource_37hul"), SubResource("Resource_po7eo"), SubResource("Resource_frnsy"), SubResource("Resource_co6lq")])
 metadata/_custom_type_script = "uid://skkfjd5prbgu"
+
+[node name="BuildingCatalog" type="Node" parent="." unique_id=839007768]
+script = ExtResource("9_bmxlf")
+BedScene = ExtResource("10_4kpch")
+ComfortableBedScene = ExtResource("11_4kpch")
+ManualGeneratorScene = ExtResource("10_4kpch")
+CoalGeneratorScene = ExtResource("10_4kpch")
+metadata/_custom_type_script = "uid://duxkrs2evcj1i"

@@ -40,15 +40,6 @@ public partial class GridWorld : Node
         Structures = new StructureGrid();
         AddChild(Structures);
 
-        _testBuildingScene =
-        GD.Load<PackedScene>(
-            TestBuildingScenePath
-        );
-        _testBuildingDefinition =
-        GD.Load<BuildingDefinition>(
-            TestBuildingDefinitionPath
-        );
-
         GenerateWorld();
     }
 
@@ -201,24 +192,5 @@ public partial class GridWorld : Node
             Mathf.RoundToInt(gridPosition.X * TileSize),
             Mathf.RoundToInt(gridPosition.Y * TileSize)
         );
-    }
-
-    public void PlaceTestBuilding(Vector2 worldPosition)
-    {
-        Vector2I gridPosition =
-            WorldToGrid(worldPosition);
-
-        if (!Structures.CanPlaceBuilding(
-                _testBuildingDefinition,
-                gridPosition))
-        {
-            GD.Print(
-                $"Cannot place building at {gridPosition}"
-            );
-
-            return;
-        }
-
-        GameServices.GetWorkOrderManager().CreateBuildOrder(_testBuildingDefinition, _testBuildingScene, gridPosition);
     }
 }

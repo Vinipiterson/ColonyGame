@@ -1,25 +1,24 @@
 using Godot;
 
-[GlobalClass]
-public partial class BuildingDefinition : Resource
+public class BuildingDefinition
 {
-    [Export]
-    public int Id;
-    [Export]
-    public string DisplayName;
-    [Export]
-    public Vector2I Size = Vector2I.One;
-    [Export]
-    public float WorkRequired = 1f;
-    
-/*
-    [Export]
-    public string ConstructionWork;
-    
-    [Export]
-    public string TerrainRequirements;
-    
-    [Export]
-    public string Materials;
-    */
+    public string Id { get; }
+    public string DisplayName { get; }
+    public Vector2I Size { get; }
+    public float WorkRequired { get; }
+    public PackedScene Scene { get; }
+
+    public BuildingDefinition(
+        string id,
+        string displayName,
+        Vector2I size,
+        float workRequired,
+        PackedScene scene)
+    {
+        Id = id;
+        DisplayName = displayName;
+        Size = size;
+        WorkRequired = workRequired;
+        Scene = scene;
+    }
 }

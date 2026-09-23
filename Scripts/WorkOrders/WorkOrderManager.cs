@@ -170,12 +170,13 @@ public partial class WorkOrderManager : Node
         return order;
     }
 
-    public WorkOrder CreateBuildOrder(BuildingDefinition definition, PackedScene scene, Vector2I tilePosition, int priority = 5)
+    public WorkOrder CreateBuildOrder(BuildingDefinition definition, Vector2I tilePosition, int priority)
     {
-        if (definition == null)
+        if (definition == null || definition.Scene == null)
             return null;
 
-        Building building = scene.Instantiate<Building>();
+        Building building = definition.Scene.Instantiate<Building>();
+        
         building.Initialize(definition, tilePosition, _world.GridToWorld(tilePosition), BuildingState.UnderConstruction);
         AddChild(building);
 

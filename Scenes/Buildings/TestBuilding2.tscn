@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://b3no41t1pdm8j"]
+
+[ext_resource type="PackedScene" uid="uid://dw32vt0g3a366" path="res://Scenes/Building.tscn" id="1_gk70s"]
+
+[node name="TestBuilding" unique_id=1884174852 instance=ExtResource("1_gk70s")]
+
+[node name="Blueprint" parent="." index="0" unique_id=1303217234]
+color = Color(3.3691526e-07, 0.68075114, 0.38299817, 1)
+
+[node name="Visual" parent="." index="1" unique_id=2099945568]
+color = Color(0.17813605, 0.040807664, 0.38311782, 1)

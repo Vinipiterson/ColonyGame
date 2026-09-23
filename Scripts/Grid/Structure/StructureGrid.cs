@@ -53,7 +53,7 @@ public partial class StructureGrid : Node
                 if (HasBuilding(tile))
                     return false;
 
-                if (!_world.IsSolid(tile))
+                if (_world.IsSolid(tile))
                     return false;
             }
         }

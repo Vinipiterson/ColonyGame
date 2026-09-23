@@ -11,7 +11,6 @@ public enum BuildingState
 [GlobalClass]
 public partial class Building : Node2D
 {
-    [Export]
     public BuildingDefinition Definition { get; set; }
 
     public Vector2I GridPosition { get; private set; }
@@ -55,5 +54,21 @@ public partial class Building : Node2D
 
         BlueprintVisual.Visible = State == BuildingState.UnderConstruction;
         DefinitiveVisual.Visible = State == BuildingState.Constructed;
+    }
+
+    public void SetGridPosition(Vector2I gridPosition, Vector2 worldPosition)
+    {
+        GridPosition = gridPosition;
+        Position = worldPosition;
+    }
+
+    public void SetBlueprintValidity(bool valid)
+    {
+        if (BlueprintVisual == null)
+            return;
+
+        BlueprintVisual.Modulate = valid
+            ? Colors.White
+            : new Color(1.0f, 0.35f, 0.35f, 0.65f);
     }
 }

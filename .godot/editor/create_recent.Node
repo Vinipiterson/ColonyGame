@@ -1,3 +1,4 @@
+BuildingCatalog
 PlayerController
 VSeparator
 PanelContainer
@@ -12,4 +13,3 @@ ColorRect
 Building
 WorkOrderManager
 GridPathFinder
-GridWorld

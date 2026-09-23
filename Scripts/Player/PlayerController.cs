@@ -25,6 +25,13 @@ public partial class PlayerController : Node
 	private WorkOrderManager _orderManager;
 	private Cursor _cursor;
 
+	private BuildingCatalog _buildingCatalog;
+
+	private BuildingDefinition _selectedBuilding;
+	private Building _buildingPreview;
+
+	private StructureGrid _structureGrid;
+
     public void SetMode(PlayerMode mode)
     {
         CurrentMode = mode;
@@ -44,6 +51,9 @@ public partial class PlayerController : Node
     {
 		_world = GameServices.GetGridWorld();
 		_orderManager = GameServices.GetWorkOrderManager();
+		_structureGrid = GameServices.GetStructureGrid();
+
+		_buildingCatalog = GetTree().GetFirstNodeInGroup("BuildingCatalog") as BuildingCatalog;
 
         _dragController = new DragController();
 		AddChild(_dragController);
@@ -61,6 +71,8 @@ public partial class PlayerController : Node
 	{
 		Vector2I gridPosition = GetMouseGridPosition();
 		_dragController.UpdateDrag(gridPosition);
+
+		UpdateBuildingPreview(gridPosition);
 	}
 
 	public override void _Input(InputEvent @event)
@@ -162,6 +174,17 @@ public partial class PlayerController : Node
 			CurrentMode = PlayerMode.Cancel;
 		}
 
+		if (keyEvent.Keycode == Key.F1)
+			SelectBuilding(0);
+		else if (keyEvent.Keycode == Key.F2)
+			SelectBuilding(1);
+
+		else if (keyEvent.Keycode == Key.F3)
+			SelectBuilding(2);
+
+		else if (keyEvent.Keycode == Key.F4)
+			SelectBuilding(3);
+
         return;
 	}
 
@@ -189,6 +212,10 @@ public partial class PlayerController : Node
 		{
 			CancelOrders(cells);
 		}
+		else if (CurrentMode == PlayerMode.Build)
+		{
+			BuildAt(cells);
+		}
 	}
 
 	private void OnDragCancelled()
@@ -208,5 +235,93 @@ public partial class PlayerController : Node
 	private void CancelOrders(List<Vector2I> cells)
 	{
 		_orderManager.CancelOrders(cells);
+	}
+
+	private void UpdateBuildingPreview(Vector2I gridPosition)
+	{
+		if (CurrentMode != PlayerMode.Build ||
+			_selectedBuilding == null)
+		{
+			DestroyBuildingPreview();
+			return;
+		}
+
+		if (_buildingPreview == null)
+			CreateBuildingPreview();
+
+		_buildingPreview.SetGridPosition(
+			gridPosition,
+			_world.GridToWorld(gridPosition));
+
+		bool canPlace = _structureGrid.CanPlaceBuilding(
+			_selectedBuilding,
+			gridPosition);
+
+		_buildingPreview.SetBlueprintValidity(canPlace);
+	}
+
+	private void CreateBuildingPreview()
+	{
+		if (_selectedBuilding == null ||
+			_selectedBuilding.Scene == null)
+			return;
+
+		_buildingPreview =
+			_selectedBuilding.Scene.Instantiate<Building>();
+
+		AddChild(_buildingPreview);
+
+		_buildingPreview.Initialize(
+			_selectedBuilding,
+			Vector2I.Zero,
+			Vector2.Zero,
+			BuildingState.UnderConstruction);
+	}
+
+	private void DestroyBuildingPreview()
+	{
+		if (_buildingPreview == null)
+			return;
+
+		_buildingPreview.QueueFree();
+		_buildingPreview = null;
+	}
+
+	private void SelectBuilding(int index)
+	{
+		if (_buildingCatalog == null)
+			return;
+
+		if (index < 0 || index >= _buildingCatalog.Buildings.Count)
+			return;
+
+		_selectedBuilding = _buildingCatalog.Buildings[index];
+
+		CurrentMode = PlayerMode.Build;
+
+		DestroyBuildingPreview();
+	}
+
+	private void BuildAt(List<Vector2I> cells)
+	{
+		if (_selectedBuilding == null)
+			return;
+
+		if (cells.Count != 1)
+			return;
+
+		Vector2I position = cells[0];
+
+		if (!_structureGrid.CanPlaceBuilding(
+			_selectedBuilding,
+			position))
+		{
+			return;
+		}
+
+		_orderManager.CreateBuildOrder(
+			_selectedBuilding,
+			position,
+			CurrentPriority);
 	}
 }
